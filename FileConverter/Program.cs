@@ -25,7 +25,7 @@ namespace FileConverter
                 }
                 string json = JsonConvert.SerializeObject(dateTimes);
                 string json2 = JsonConvert.SerializeObject(data);
-                File.WriteAllText(files[i] + "conv.json", "{ dates: " + json + ", vals: " + json2 + "}");
+                File.WriteAllText(files[i] + "conv.json", "{ \"dates\": " + json + ", \"vals\": " + json2 + "}");
             }
         }
     }
