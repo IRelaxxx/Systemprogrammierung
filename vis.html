@@ -1,0 +1,62 @@
+  <html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(showBut);
+
+      function showBut() {
+            document.getElementById('file-input').addEventListener('change', readFile, false);
+      }
+      var file2;
+      function readFile(e) {
+        var file = e.target.files[0];
+        console.log(file);
+        file2 = file;
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            drawChart(JSON.parse(contents));
+        };
+        reader.readAsText(file);
+      }
+
+      function drawChart(dataIn) {
+        /*var data = new google.visualization.DataTable();
+        //var dataArray = [];*/
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Time');
+        data.addColumn('number', 'Data');
+        for(i = 0; i < dataIn.dates.length; i++) {
+            data.addRow([new Date(Date.parse(dataIn.dates[i])), parseInt(dataIn.vals[i])]);
+        }
+        //console.log(dataArray);
+        //var data = google.visualization.arrayToDataTable(dataArray);
+        /*var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses'],
+          ['2004',  1000,      400],
+          ['2005',  1170,      460],
+          ['2006',  660,       1120],
+          ['2007',  1030,      540]
+        ]);*/
+        console.log(data);
+        var options = {
+          title: 'Data',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+  <input type="file" id="file-input" />
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+  </body>
+</html>
