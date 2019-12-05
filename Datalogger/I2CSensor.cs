@@ -19,7 +19,7 @@ namespace Datalogger
         public int getData()
         {
             byte[] data = dev.readData(1);
-            file.Write(Encoding.ASCII.GetBytes(DateTime.Now.ToString()));
+            file.Write(Encoding.ASCII.GetBytes(DateTime.Now.ToString("MM-dd-yyyy HH:mm:ss")));
             file.Write(Encoding.ASCII.GetBytes(";"));
             file.Write(data); // TODO: correct to readable ascii
             file.Write(Encoding.ASCII.GetBytes("/n"));

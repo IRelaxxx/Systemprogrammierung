@@ -146,7 +146,7 @@ namespace Datalogger
             symbols[9][2, 4] = true;
         }
 
-        public void writeNumber(short input)
+        public void writeNumber(int input)
         {
             if (input > 9) return; // only accept a single number
             if (offset > 9) return; // do not write out of bounds
