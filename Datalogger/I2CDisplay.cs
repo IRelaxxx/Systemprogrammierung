@@ -8,6 +8,16 @@ namespace Datalogger
     public partial class I2CDisplay
     {
         private readonly I2CDevice dev;
+        // 12 Rows with a length of 10
+        // Coordinate origin top right
+        // 12                  0
+        // <-------------------
+        //                    | 0
+        //                    |
+        //                    | 0xff <- die ersten 8 leds
+        //                    |
+        //                    | 0x03 <- die untern 2 leds an
+        //                    \/ 10
         private bool[,] pixels = new bool[10, 12];
         private readonly bool[][,] symbols = new bool[10][,];
         private int offset = 0;
@@ -163,11 +173,29 @@ namespace Datalogger
 
         public void flush()
         {
-            offset = 0;
-
             // write data
 
+            byte addr = 0;
+            for(int i = 0; i < 12; i++)
+            {
+                uint dataBytes = 0;
+                for(int j = 0; j < 10; j++)
+                {
+                    if (pixels[j,i]) dataBytes++;
+                    dataBytes <<= 1;
+
+                }
+                byte[] data = new byte[3];
+                data[0] = addr;
+                data[1] = (byte)(dataBytes & 0b1111_1111);
+                data[2] = (byte)((dataBytes >> 8) & 0b1111_1111);
+                int ret = dev.writeData(3, data);
+                addr += 2;
+            }
+
             // reset data
+            offset = 0;
+
             for (int x = 0; x < pixels.GetLength(0); x++)
             {
                 for (int y = 0; y < pixels.GetLength(1); y++)

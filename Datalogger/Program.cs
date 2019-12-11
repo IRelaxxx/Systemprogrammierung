@@ -8,11 +8,12 @@ namespace Datalogger
     {
         private static void Main(string[] args)
         {
-            I2CDisplay disp = new I2CDisplay(48);
+            I2CDisplay disp = new I2CDisplay(0x49);
             I2CSensor sens = new I2CSensor(1);
             GPIOModule mod = new GPIOModule(); // static instead of object?
-
-            while (true)
+            disp.writeNumber(1);
+            disp.flush();
+           /* while (true)
             {
                 GPIOStatus status = mod.getStatus();
                 int data = sens.getData();
@@ -20,7 +21,7 @@ namespace Datalogger
                 disp.writeNumber(data / 10);
                 disp.flush();
                 Thread.Sleep(1000);
-            }
+            }*/
         }
     }
 }

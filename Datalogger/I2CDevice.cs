@@ -10,7 +10,7 @@ namespace Datalogger
         private static int OPEN_READ_WRITE = 2;
         private static int I2C_SLAVE = 0x0703;
 
-        [DllImport("libc.so.6", EntryPoint = "open")]
+        [DllImport("libc.so.6", EntryPoint = "open", SetLastError = true)]
         internal static extern int Open(string fileName, int mode);
 
         [DllImport("libc.so.6", EntryPoint = "ioctl", SetLastError = true)]
@@ -45,14 +45,31 @@ namespace Datalogger
             return data;
         }
 
-        public void writeData(int length, byte[] data)
+        public int writeData(int length, byte[] data)
         {
             int fd = Open("/dev/i2c-1", OPEN_READ_WRITE);
-            if (fd < 0) return;
+            if (fd < 0)
+            {
+                int errno = Marshal.GetLastWin32Error();
+                Console.WriteLine("Open errno: {0}", errno);
+                return errno;
+            }
             var deviceReturncode = Ioctl(fd, I2C_SLAVE, address);
-            if (deviceReturncode < 0) return;
-            Write(fd, data, length);
+            if (deviceReturncode < 0)
+            {
+                int errno = Marshal.GetLastWin32Error();
+                Console.WriteLine("Icctl errno: {0}", errno);
+                return errno;
+            }
+            var err = Write(fd, data, length);
+            if (err < 0)
+            {
+                int errno = Marshal.GetLastWin32Error();
+                Console.WriteLine("Write errno: {0}", errno);
+                return errno;
+            }
             Close(fd);
+            return 0;
         }
     }
 }
