@@ -12,6 +12,7 @@ namespace Datalogger
             I2CSensor sens = new I2CSensor(1);
             GPIOModule mod = new GPIOModule(); // static instead of object?
             disp.writeNumber(1);
+            disp.writeNumber(2);
             disp.flush();
            /* while (true)
             {

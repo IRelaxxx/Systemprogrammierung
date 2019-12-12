@@ -22,7 +22,7 @@ namespace Datalogger
                     return GPIOStatus.Sens2;
 
                 default:
-                    return GPIOStatus.Invalid;
+                    throw new IOException(String.Format("Could not read /dev/boi output should be 0 or 1 (binary) but was {0}", data[0]));
             }
         }
     }

@@ -199,7 +199,7 @@ namespace Datalogger
                 data[0] = addr;
                 data[1] = (byte)(dataBytes & 0b1111_1111);
                 data[2] = (byte)((dataBytes >> 8) & 0b1111_1111);
-                //int ret = dev.writeData(3, data);
+                int ret = dev.writeData(3, data);
                 addr += 2;
             }
 
