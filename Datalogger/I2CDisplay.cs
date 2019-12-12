@@ -190,16 +190,16 @@ namespace Datalogger
             for (int i = 0; i < 12; i++)
             {
                 uint dataBytes = 0;
-                for (int j = 0; j < 10; j++)
+                for (int j = 9; j >= 0; j--)
                 {
-                    if (pixels[i, j]) dataBytes++;
                     dataBytes <<= 1;
+                    if (pixels[i, j]) dataBytes++;
                 }
                 byte[] data = new byte[3];
                 data[0] = addr;
                 data[1] = (byte)(dataBytes & 0b1111_1111);
                 data[2] = (byte)((dataBytes >> 8) & 0b1111_1111);
-                int ret = dev.writeData(3, data);
+                //int ret = dev.writeData(3, data);
                 addr += 2;
             }
 
