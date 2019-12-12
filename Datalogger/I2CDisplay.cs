@@ -8,6 +8,7 @@ namespace Datalogger
     public partial class I2CDisplay
     {
         private readonly I2CDevice dev;
+
         // 12 Rows with a length of 10
         // Coordinate origin top right
         // 12                  0
@@ -18,9 +19,10 @@ namespace Datalogger
         //                    |
         //                    | 0x03 <- die untern 2 leds an
         //                    \/ 10
-        private bool[,] pixels = new bool[10, 12];
+        private bool[,] pixels = new bool[12, 10];
+
         private readonly bool[][,] symbols = new bool[10][,];
-        private int offset = 0;
+        private int offset = 11;
 
         public I2CDisplay(int address)
         {
@@ -159,31 +161,39 @@ namespace Datalogger
         public void writeNumber(int input)
         {
             if (input > 9) return; // only accept a single number
-            if (offset > 9) return; // do not write out of bounds
+            if (offset < 0) return; // do not write out of bounds
             for (int x = 0; x < symbols[input].GetLength(0); x++)
             {
                 for (int y = 0; y < symbols[input].GetLength(1); y++)
                 {
-                    pixels[x + offset, y] = symbols[input][x, y];
+                    pixels[-x + offset, y] = symbols[input][x, y];
                 }
             }
 
-            offset += 3;
+            offset -= 3;
         }
 
         public void flush()
         {
+            for (int i = 0; i < 12; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    Console.Write(pixels[i, j] ? "1" : "0");
+                }
+                Console.WriteLine("");
+            }
+
             // write data
 
             byte addr = 0;
-            for(int i = 0; i < 12; i++)
+            for (int i = 0; i < 12; i++)
             {
                 uint dataBytes = 0;
-                for(int j = 0; j < 10; j++)
+                for (int j = 0; j < 10; j++)
                 {
-                    if (pixels[j,i]) dataBytes++;
+                    if (pixels[i, j]) dataBytes++;
                     dataBytes <<= 1;
-
                 }
                 byte[] data = new byte[3];
                 data[0] = addr;
@@ -194,7 +204,7 @@ namespace Datalogger
             }
 
             // reset data
-            offset = 0;
+            offset = 11;
 
             for (int x = 0; x < pixels.GetLength(0); x++)
             {
