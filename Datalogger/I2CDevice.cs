@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Datalogger
 {
-    public class I2CDevice
+    internal class I2CDevice
     {
-        private static int OPEN_READ_WRITE = 2;
-        private static int I2C_SLAVE = 0x0703;
+        private const int OPEN_READ_WRITE = 2;
+        private const int I2C_SLAVE = 0x0703;
 
         [DllImport("libc.so.6", EntryPoint = "open", SetLastError = true)]
         internal static extern int Open(string fileName, int mode);

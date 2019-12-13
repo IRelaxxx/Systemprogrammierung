@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libBMP280.so -o libBMP280.so CMakeFiles/BMP280.dir/bmp280.c.o CMakeFiles/BMP280.dir/bmp280lib.c.o 

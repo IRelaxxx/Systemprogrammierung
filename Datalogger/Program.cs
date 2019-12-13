@@ -9,7 +9,7 @@ namespace Datalogger
         private static void Main(string[] args)
         {
             I2CDisplay disp = new I2CDisplay(0x49);
-            I2CSensor sens = new I2CSensor(1);
+            BMP280Sensor sens = new BMP280Sensor();
             GPIOModule mod = new GPIOModule(); // static instead of object?
             disp.writeNumber(1);
             disp.writeNumber(2);

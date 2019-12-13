@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/core/BMP280/bmp280.h
+bmp280_defs.h
+/home/core/BMP280/bmp280_defs.h
+
+/home/core/BMP280/bmp280_defs.h
+linux/types.h
+-
+linux/kernel.h
+-
+stdint.h
+-
+stddef.h
+-
+
+/home/core/BMP280/bmp280lib.c
+stdio.h
+/home/core/BMP280/stdio.h
+bmp280.h
+/home/core/BMP280/bmp280.h
+fcntl.h
+-
+unistd.h
+-
+sys/ioctl.h
+-
+linux/i2c-dev.h
+-
+errno.h
+-
+

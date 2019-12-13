@@ -6,8 +6,8 @@ namespace Datalogger
 {
     public enum GPIOStatus
     {
-        Sens1,
-        Sens2,
+        Temperature = 0,
+        Pressure = 1,
         Invalid
     }
 }
