@@ -11,18 +11,23 @@ namespace Datalogger
             I2CDisplay disp = new I2CDisplay(0x49);
             BMP280Sensor sens = new BMP280Sensor();
             GPIOModule mod = new GPIOModule(); // static instead of object?
-            disp.writeNumber(1);
-            disp.writeNumber(2);
-            disp.flush();
-           /* while (true)
+            while (true)
             {
                 GPIOStatus status = mod.getStatus();
-                int data = sens.getData();
+                double data = sens.getData(status);
+                switch (status)
+                {
+                    case GPIOStatus.Temperature:
+                        break;
+
+                    case GPIOStatus.Pressure:
+                        break;
+                }
                 disp.writeNumber(data % 10);
                 disp.writeNumber(data / 10);
                 disp.flush();
                 Thread.Sleep(1000);
-            }*/
+            }
         }
     }
 }
