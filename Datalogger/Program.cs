@@ -18,13 +18,12 @@ namespace Datalogger
                 switch (status)
                 {
                     case GPIOStatus.Temperature:
+                        disp.write(data.ToString()); // TODO: trim to 1 decimal point
                         break;
 
                     case GPIOStatus.Pressure:
                         break;
                 }
-                disp.writeNumber(data % 10);
-                disp.writeNumber(data / 10);
                 disp.flush();
                 Thread.Sleep(1000);
             }

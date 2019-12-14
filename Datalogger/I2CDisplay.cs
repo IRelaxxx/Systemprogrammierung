@@ -173,6 +173,7 @@ namespace Datalogger
                 case '8': return 7;
                 case '9': return 8;
                 case '-': return 10;
+                case '.': return 11;
             }
             return -1;
         }
