@@ -1,3 +1,0 @@
-/home/core/BMP280/build/CMakeFiles/rebuild_cache.dir
-/home/core/BMP280/build/CMakeFiles/BMP280.dir
-/home/core/BMP280/build/CMakeFiles/edit_cache.dir

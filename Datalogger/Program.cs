@@ -17,6 +17,7 @@ namespace Datalogger
                 {
                     case GPIOStatus.Temperature:
                         disp.write(data.ToString()); // TODO: trim to 1 decimal point
+                        disp.writeLow("<C");
                         break;
 
                     case GPIOStatus.Pressure:

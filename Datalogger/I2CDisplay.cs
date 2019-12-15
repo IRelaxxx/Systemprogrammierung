@@ -21,12 +21,13 @@ namespace Datalogger
 
         private readonly bool[][,] symbols = new bool[10][,];
         private int offset = 11;
+        private int offsetLow = 11;
 
         public I2CDisplay(int address)
         {
             dev = new I2CDevice(address);
             // 0
-            symbols[0] = new bool[3, 10];
+            symbols[0] = new bool[3, 6];
             symbols[0][0, 1] = true;
             symbols[0][0, 2] = true;
             symbols[0][0, 3] = true;
@@ -39,7 +40,7 @@ namespace Datalogger
             symbols[0][2, 4] = true;
 
             // 1
-            symbols[1] = new bool[3, 10];
+            symbols[1] = new bool[3, 6];
             symbols[1][0, 1] = true;
             symbols[1][1, 0] = true;
             symbols[1][2, 0] = true;
@@ -50,7 +51,7 @@ namespace Datalogger
             symbols[1][2, 5] = true;
 
             // 2
-            symbols[2] = new bool[3, 10];
+            symbols[2] = new bool[3, 6];
             symbols[2][0, 1] = true;
             symbols[2][0, 4] = true;
             symbols[2][0, 5] = true;
@@ -62,7 +63,7 @@ namespace Datalogger
             symbols[2][2, 5] = true;
 
             // 3
-            symbols[3] = new bool[3, 10];
+            symbols[3] = new bool[3, 6];
             symbols[3][0, 0] = true;
             symbols[3][0, 2] = true;
             symbols[3][0, 5] = true;
@@ -77,7 +78,7 @@ namespace Datalogger
             symbols[3][2, 5] = true;
 
             // 4
-            symbols[4] = new bool[3, 10];
+            symbols[4] = new bool[3, 6];
             symbols[4][0, 2] = true;
             symbols[4][0, 3] = true;
             symbols[4][1, 1] = true;
@@ -90,7 +91,7 @@ namespace Datalogger
             symbols[4][2, 5] = true;
 
             // 5
-            symbols[5] = new bool[3, 10];
+            symbols[5] = new bool[3, 6];
             symbols[5][0, 0] = true;
             symbols[5][0, 1] = true;
             symbols[5][0, 2] = true;
@@ -103,7 +104,7 @@ namespace Datalogger
             symbols[5][2, 4] = true;
 
             // 6
-            symbols[6] = new bool[3, 10];
+            symbols[6] = new bool[3, 6];
             symbols[6][0, 1] = true;
             symbols[6][0, 2] = true;
             symbols[6][0, 3] = true;
@@ -119,7 +120,7 @@ namespace Datalogger
             symbols[6][2, 5] = true;
 
             // 7
-            symbols[7] = new bool[3, 10];
+            symbols[7] = new bool[3, 6];
             symbols[7][0, 0] = true;
             symbols[7][0, 2] = true;
             symbols[7][0, 5] = true;
@@ -132,7 +133,7 @@ namespace Datalogger
             symbols[7][2, 2] = true;
 
             // 8
-            symbols[8] = new bool[3, 10];
+            symbols[8] = new bool[3, 6];
             symbols[8][0, 1] = true;
             symbols[8][0, 2] = true;
             symbols[8][0, 4] = true;
@@ -144,7 +145,7 @@ namespace Datalogger
             symbols[8][2, 4] = true;
 
             // 9
-            symbols[9] = new bool[3, 10];
+            symbols[9] = new bool[3, 6];
             symbols[9][0, 1] = true;
             symbols[9][0, 5] = true;
             symbols[9][1, 0] = true;
@@ -154,6 +155,28 @@ namespace Datalogger
             symbols[9][2, 2] = true;
             symbols[9][2, 3] = true;
             symbols[9][2, 4] = true;
+
+            symbols[10] = new bool[3, 6];
+            symbols[10][0, 2] = true;
+            symbols[10][1, 2] = true;
+            symbols[10][2, 2] = true;
+
+            symbols[11] = new bool[3, 6];
+            symbols[11][1, 5] = true;
+
+            symbols[12] = new bool[3, 4];
+            symbols[12][0, 1] = true;
+            symbols[12][1, 0] = true;
+            symbols[12][1, 2] = true;
+            symbols[12][2, 1] = true;
+
+            symbols[13] = new bool[3, 4];
+            symbols[13][0, 1] = true;
+            symbols[13][0, 2] = true;
+            symbols[13][1, 0] = true;
+            symbols[13][1, 3] = true;
+            symbols[13][2, 0] = true;
+            symbols[13][2, 3] = true;
         }
 
         private int getIndex(char input)
@@ -172,6 +195,8 @@ namespace Datalogger
                 case '9': return 8;
                 case '-': return 10;
                 case '.': return 11;
+                case '<': return 12; // circ
+                case 'C': return 13; // circ
             }
             return -1;
         }
@@ -180,22 +205,30 @@ namespace Datalogger
         {
             for (int i = 0; i < text.Length; i++)
             {
-                writeNumber(text[i]);
+                writeChar(text[i], 0);
             }
         }
 
-        private void writeNumber(char inputChar)
+        public void writeLow(string text)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                writeChar(text[i], 6);
+            }
+        }
+
+        private void writeChar(char inputChar, int offsetY)
         {
             int input = getIndex(inputChar);
             for (int x = 0; x < symbols[input].GetLength(0); x++)
             {
                 for (int y = 0; y < symbols[input].GetLength(1); y++)
                 {
-                    pixels[-x + offset, y] = symbols[input][x, y];
+                    pixels[-x + offset, y + offsetY] = symbols[input][x, y];
                 }
             }
 
-            offset -= 3;
+            offset -= symbols[input].GetLength(0);
         }
 
         public void flush()
@@ -230,6 +263,7 @@ namespace Datalogger
 
             // reset data
             offset = 11;
+            offsetLow = 11;
 
             for (int x = 0; x < pixels.GetLength(0); x++)
             {
