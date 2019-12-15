@@ -12,7 +12,7 @@ namespace FileConverter
 
             for (int i = 0; i < files.Length; i++)
             {
-                if (!files[i].Contains("i2c") || files[i].Contains(".json")) continue;
+                if (!files[i].Contains("temperature") || files[i].Contains("pressure")) continue;
                 string[] text = File.ReadAllLines(files[i]);
                 DateTime[] dateTimes = new DateTime[text.Length];
                 string[] data = new string[text.Length];
@@ -24,7 +24,13 @@ namespace FileConverter
                 }
                 string json = JsonConvert.SerializeObject(dateTimes);
                 string json2 = JsonConvert.SerializeObject(data);
-                File.WriteAllText(files[i] + "conv.json", "{ \"dates\": " + json + ", \"vals\": " + json2 + "}");
+                json = json.Substring(1);
+                json2 = json2.Substring(1);
+                int lastDirSep = files[i].LastIndexOf(Path.DirectorySeparatorChar);
+                int length = files[i].Length - 5 - lastDirSep;
+                json = "[\"\"," + json;
+                json2 = "[\"" + files[i].Substring(lastDirSep + 1, length) + "\"," + json2;
+                File.WriteAllText(files[i].Substring(0, files[i].Length - 4) + ".json", "{ \"dates\": " + json + ", \"vals\": " + json2 + "}");
             }
         }
     }

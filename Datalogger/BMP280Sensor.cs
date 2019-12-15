@@ -21,8 +21,8 @@ namespace Datalogger
 
         public BMP280Sensor()
         {
-            tempFile = File.OpenWrite("tempData.csv");
-            presFile = File.OpenWrite("presData.csv");
+            tempFile = File.OpenWrite("temperature.csv");
+            presFile = File.OpenWrite("pressure.csv");
             bmp280lib_init();
         }
 

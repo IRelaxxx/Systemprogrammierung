@@ -25,23 +25,12 @@
       }
 
       function drawChart(dataIn) {
-        /*var data = new google.visualization.DataTable();
-        //var dataArray = [];*/
         var data = new google.visualization.DataTable();
         data.addColumn('datetime', 'Time');
-        data.addColumn('number', 'Data');
-        for(i = 0; i < dataIn.dates.length; i++) {
+        data.addColumn('number', dataIn.vals[0]);
+        for(i = 1; i < dataIn.dates.length; i++) {
             data.addRow([new Date(Date.parse(dataIn.dates[i])), parseInt(dataIn.vals[i])]);
         }
-        //console.log(dataArray);
-        //var data = google.visualization.arrayToDataTable(dataArray);
-        /*var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales', 'Expenses'],
-          ['2004',  1000,      400],
-          ['2005',  1170,      460],
-          ['2006',  660,       1120],
-          ['2007',  1030,      540]
-        ]);*/
         console.log(data);
         var options = {
           title: 'Data',
