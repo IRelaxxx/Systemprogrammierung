@@ -3,7 +3,7 @@
  */
 
 #include "stdio.h"
-#include "bmp280.h"
+#include "BMP280_driver/bmp280.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
