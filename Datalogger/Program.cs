@@ -7,9 +7,12 @@ namespace Datalogger
         private static void Main(string[] args)
         {
             I2CDisplay disp = new I2CDisplay(0x49);
-            BMP280Sensor sens = new BMP280Sensor();
+            //BMP280Sensor sens = new BMP280Sensor();
             GPIOModule mod = new GPIOModule(); // static instead of object?
-            while (true)
+            disp.write("-1.1");
+            disp.writeLow("<C");
+            disp.flush();
+            /*while (true)
             {
                 GPIOStatus status = mod.getStatus();
                 double data = sens.getData(status);
@@ -25,7 +28,7 @@ namespace Datalogger
                 }
                 disp.flush();
                 Thread.Sleep(1000);
-            }
+            }*/
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Datalogger
         //                    \/ 10
         private bool[,] pixels = new bool[12, 10];
 
-        private readonly bool[][,] symbols = new bool[10][,];
+        private readonly bool[][,] symbols = new bool[14][,];
         private int offset = 11;
         private int offsetLow = 11;
 
@@ -183,16 +183,16 @@ namespace Datalogger
         {
             switch (input)
             {
-                case '0': return 9;
-                case '1': return 0;
-                case '2': return 1;
-                case '3': return 2;
-                case '4': return 3;
-                case '5': return 4;
-                case '6': return 5;
-                case '7': return 6;
-                case '8': return 7;
-                case '9': return 8;
+                case '0': return 0;
+                case '1': return 1;
+                case '2': return 2;
+                case '3': return 3;
+                case '4': return 4;
+                case '5': return 5;
+                case '6': return 6;
+                case '7': return 7;
+                case '8': return 8;
+                case '9': return 9;
                 case '-': return 10;
                 case '.': return 11;
                 case '<': return 12; // circ
@@ -205,7 +205,9 @@ namespace Datalogger
         {
             for (int i = 0; i < text.Length; i++)
             {
-                writeChar(text[i], 0);
+                int index = getIndex(text[i]);
+                writeChar(index, 0, offset);
+                offset -= symbols[index].GetLength(0);
             }
         }
 
@@ -213,22 +215,22 @@ namespace Datalogger
         {
             for (int i = 0; i < text.Length; i++)
             {
-                writeChar(text[i], 6);
+                int index = getIndex(text[i]);
+                writeChar(index, 6, offsetLow);
+                offsetLow -= symbols[index].GetLength(0);
             }
         }
 
-        private void writeChar(char inputChar, int offsetY)
+        private void writeChar(int input, int offsetY, int offsetX)
         {
-            int input = getIndex(inputChar);
+            if (offsetX < 0) return;
             for (int x = 0; x < symbols[input].GetLength(0); x++)
             {
                 for (int y = 0; y < symbols[input].GetLength(1); y++)
                 {
-                    pixels[-x + offset, y + offsetY] = symbols[input][x, y];
+                    pixels[-x + offsetX, y + offsetY] = symbols[input][x, y];
                 }
             }
-
-            offset -= symbols[input].GetLength(0);
         }
 
         public void flush()
