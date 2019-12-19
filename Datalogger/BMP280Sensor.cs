@@ -13,7 +13,7 @@ namespace Datalogger
         [DllImport("libBMP280.so", EntryPoint = "bmp280lib_get_temp", SetLastError = true)]
         internal extern static double bmp280lib_get_temp();
 
-        [DllImport("libBMP280.so", EntryPoint = "bmp280lib_get_pres", SetLastError = true)]
+        [DllImport("libBMP280.so", EntryPoint = "bmp280lib_get_press", SetLastError = true)]
         internal extern static double bmp280lib_get_pres();
 
         private FileStream tempFile;
@@ -43,8 +43,8 @@ namespace Datalogger
             presFile.Write(Encoding.ASCII.GetBytes(";"));
             tempFile.Write(Encoding.ASCII.GetBytes(temp.ToString()));
             presFile.Write(Encoding.ASCII.GetBytes(pres.ToString()));
-            tempFile.Write(Encoding.ASCII.GetBytes("/n"));
-            presFile.Write(Encoding.ASCII.GetBytes("/n"));
+            tempFile.Write(Encoding.ASCII.GetBytes("\n"));
+            presFile.Write(Encoding.ASCII.GetBytes("\n"));
             tempFile.Flush();
             presFile.Flush();
             return status == GPIOStatus.Temperature ? temp : pres;

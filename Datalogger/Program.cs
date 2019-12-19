@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace Datalogger
 {
@@ -7,11 +8,16 @@ namespace Datalogger
         private static void Main(string[] args)
         {
             I2CDisplay disp = new I2CDisplay(0x49);
-            //BMP280Sensor sens = new BMP280Sensor();
+            BMP280Sensor sens = new BMP280Sensor();
+            while (true)
+            {
+                Console.WriteLine(sens.getData(GPIOStatus.Temperature));
+                Thread.Sleep(1000);
+            }
             GPIOModule mod = new GPIOModule(); // static instead of object?
-            disp.write("-1.1");
-            disp.writeLow("<C");
-            disp.flush();
+            //disp.write("-1.1");
+            //disp.writeLow("<C");
+            //disp.flush();
             /*while (true)
             {
                 GPIOStatus status = mod.getStatus();

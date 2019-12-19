@@ -1,7 +1,3 @@
-/*!
- *  @brief Example shows basic application to configure and read the temperature.
- */
-
 #include "stdio.h"
 #include "BMP280_driver/bmp280.h"
 #include <fcntl.h>
@@ -15,16 +11,15 @@ int8_t i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t* reg_data, uint
 int8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t* reg_data, uint16_t length);
 void print_rslt(const char api_name[], int8_t rslt);
 
-int8_t rslt;
-struct bmp280_dev bmp;
-struct bmp280_config conf;
+static struct bmp280_dev bmp;
+static struct bmp280_config conf;
 
 void bmp280lib_init() {
     /* Map the delay function pointer with the function responsible for implementing the delay */
     bmp.delay_ms = delay_ms;
 
     /* Assign device I2C address based on the status of SDO pin (GND for PRIMARY(0x76) & VDD for SECONDARY(0x77)) */
-    bmp.dev_id = BMP280_I2C_ADDR_PRIM;
+    bmp.dev_id = BMP280_I2C_ADDR_SEC;
 
     /* Select the interface mode as I2C */
     bmp.intf = BMP280_I2C_INTF;
@@ -33,7 +28,7 @@ void bmp280lib_init() {
     bmp.read = i2c_reg_read;
     bmp.write = i2c_reg_write;
 
-    rslt = bmp280_init(&bmp);
+    int8_t rslt = bmp280_init(&bmp);
     print_rslt(" bmp280_init status", rslt);
 
     /* Always read the current settings before writing, especially when
@@ -44,36 +39,42 @@ void bmp280lib_init() {
 
     /* configuring the temperature oversampling, filter coefficient and output data rate */
     /* Overwrite the desired settings */
-    conf.filter = BMP280_FILTER_COEFF_2;
+    conf.filter = BMP280_FILTER_COEFF_4;
 
-    /* Temperature oversampling set at 4x */
-    conf.os_temp = BMP280_OS_4X;
+    /* Temperature oversampling set at 1x */
+    conf.os_temp = BMP280_OS_2X;
 
-    /* Pressure over sampling none (disabling pressure measurement) */
-    conf.os_pres = BMP280_OS_4X;
+    /* Pressure oversampling set at 8x */
+    conf.os_pres = BMP280_OS_16X;
 
     /* Setting the output data rate as 1HZ(1000ms) */
-    conf.odr = BMP280_ODR_1000_MS;
+    conf.odr = BMP280_ODR_125_MS;
     rslt = bmp280_set_config(&conf, &bmp);
     print_rslt(" bmp280_set_config status", rslt);
 
     /* Always set the power mode after setting the configuration */
     rslt = bmp280_set_power_mode(BMP280_NORMAL_MODE, &bmp);
     print_rslt(" bmp280_set_power_mode status", rslt);
+	// Wait for some messurements
+	delay_ms(1000);
 }
 
 double bmp280lib_get_temp() {
     struct bmp280_uncomp_data ucomp_data;
     int32_t temp32;
     double temp;
+	delay_ms(50);
     /* Reading the raw data from sensor */
-    rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
-
+    int8_t rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
+	print_rslt(" bmp280_get_uncomp_data", rslt);
     /* Getting the 32 bit compensated temperature */
     rslt = bmp280_get_comp_temp_32bit(&temp32, ucomp_data.uncomp_temp, &bmp);
-
+	print_rslt(" bmp280_get_comp_temp_32bit", rslt);
     /* Getting the compensated temperature as floating point value */
     rslt = bmp280_get_comp_temp_double(&temp, ucomp_data.uncomp_temp, &bmp);
+	print_rslt(" bmp280_get_comp_temp_double", rslt);
+	printf("UT: %ld, T32: %ld, T: %f \r\n", ucomp_data.uncomp_temp, temp32, temp);
+	return temp;
 }
 
 double bmp280lib_get_press() {
@@ -82,17 +83,17 @@ double bmp280lib_get_press() {
     double pres;
 
     /* Reading the raw data from sensor */
-    rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
-
+    int8_t rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
+	print_rslt(" bmp280_get_uncomp_data", rslt);
     /* Getting the compensated pressure using 32 bit precision */
     rslt = bmp280_get_comp_pres_32bit(&pres32, ucomp_data.uncomp_press, &bmp);
-
+	print_rslt(" bmp280_get_comp_pres_32bit", rslt);
     /* Getting the compensated pressure using 64 bit precision */
     rslt = bmp280_get_comp_pres_64bit(&pres64, ucomp_data.uncomp_press, &bmp);
-
+	print_rslt(" bmp280_get_comp_pres_64bit", rslt);
     /* Getting the compensated pressure as floating point value */
     rslt = bmp280_get_comp_pres_double(&pres, ucomp_data.uncomp_press, &bmp);
-
+	print_rslt(" bmp280_get_comp_pres_double", rslt);
     return pres;
 }
 
@@ -139,12 +140,20 @@ int8_t i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t* reg_data, uint
         printf("ioctl failed errno: %d\n", errno);
         return -1;
     }
+	// Write reg address
+	if(write(fd, &reg_addr, 1) != 1) {
+		printf("could not write reg addr errno %d\n");
+		return -1;
+	}
     /* Implement the I2C write routine according to the target machine. */
     if (write(fd, reg_data, length) != length) {
         printf("write failed errno %d\n", errno);
         return -1;
     }
-    close(fd);
+    if(close(fd) < 0) {
+		printf("close failed errno %d\n", errno);
+		return -1;
+	}
     return 0;
 }
 
@@ -178,11 +187,19 @@ int8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t* reg_data, uint1
         printf("ioctl failed errno: %d\n", errno);
         return -1;
     }
-
+		// Write reg address
+	if(write(fd, &reg_addr, 1) != 1) {
+		printf("could not write reg addr errno %d\n");
+		return -1;
+	}
     if (read(fd, reg_data, length) != length) {
         printf("read failed. errno %d\n", errno);
         return -1;
     }
+	if(close(fd) < 0) {
+		printf("close failed errno %d\n", errno);
+		return -1;
+	}
     return 0;
 }
 
