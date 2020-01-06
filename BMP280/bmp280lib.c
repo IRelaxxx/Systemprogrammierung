@@ -15,6 +15,7 @@ static struct bmp280_dev bmp;
 static struct bmp280_config conf;
 
 void bmp280lib_init() {
+	printf("init");
     /* Map the delay function pointer with the function responsible for implementing the delay */
     bmp.delay_ms = delay_ms;
 
@@ -48,7 +49,7 @@ void bmp280lib_init() {
     conf.os_pres = BMP280_OS_16X;
 
     /* Setting the output data rate as 1HZ(1000ms) */
-    conf.odr = BMP280_ODR_125_MS;
+    conf.odr = BMP280_ODR_500_MS;
     rslt = bmp280_set_config(&conf, &bmp);
     print_rslt(" bmp280_set_config status", rslt);
 
@@ -56,16 +57,21 @@ void bmp280lib_init() {
     rslt = bmp280_set_power_mode(BMP280_NORMAL_MODE, &bmp);
     print_rslt(" bmp280_set_power_mode status", rslt);
 	// Wait for some messurements
-	delay_ms(1000);
+	//delay_ms(1000);
 }
 
 double bmp280lib_get_temp() {
     struct bmp280_uncomp_data ucomp_data;
+	struct bmp280_status status;
     int32_t temp32;
     double temp;
-	delay_ms(50);
+	int8_t rslt = bmp280_set_power_mode(BMP280_FORCED_MODE, &bmp);
+    print_rslt(" bmp280_set_power_mode status", rslt);
+	delay_ms(600);
+	bmp280_get_status(&status, &bmp);
+	printf("status: %d %d", status.measuring, status.im_update);
     /* Reading the raw data from sensor */
-    int8_t rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
+    rslt = bmp280_get_uncomp_data(&ucomp_data, &bmp);
 	print_rslt(" bmp280_get_uncomp_data", rslt);
     /* Getting the 32 bit compensated temperature */
     rslt = bmp280_get_comp_temp_32bit(&temp32, ucomp_data.uncomp_temp, &bmp);

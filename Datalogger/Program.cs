@@ -11,16 +11,16 @@ namespace Datalogger
             BMP280Sensor sens = new BMP280Sensor();
             while (true)
             {
-                Console.WriteLine(sens.getData(GPIOStatus.Temperature));
+                Console.WriteLine(sens.bmp280_get_temp());
                 Thread.Sleep(1000);
             }
             GPIOModule mod = new GPIOModule(); // static instead of object?
             //disp.write("-1.1");
             //disp.writeLow("<C");
             //disp.flush();
-            /*while (true)
+            while (true)
             {
-                GPIOStatus status = mod.getStatus();
+                GPIOStatus status = GPIOStatus.Temperature;//mod.getStatus();
                 double data = sens.getData(status);
                 switch (status)
                 {
@@ -30,11 +30,13 @@ namespace Datalogger
                         break;
 
                     case GPIOStatus.Pressure:
+                        disp.write(data.ToString());
+                        disp.writeLow("pa");//TODO: display string
                         break;
                 }
                 disp.flush();
                 Thread.Sleep(1000);
-            }*/
+            }
         }
     }
 }

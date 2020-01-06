@@ -20,7 +20,7 @@ namespace Datalogger
                     return GPIOStatus.Pressure;
 
                 default:
-                    throw new IOException(String.Format("Could not read /dev/boi output should be 0 or 1 (binary) but was {0}", data[0]));
+                    throw new IOException(string.Format("Could not read /dev/boi output should be 0 or 1 (binary) but was {0}", data[0]));
             }
         }
     }
