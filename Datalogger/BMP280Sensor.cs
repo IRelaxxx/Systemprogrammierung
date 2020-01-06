@@ -19,7 +19,7 @@ namespace Datalogger
         public byte txsb;
 
         public UInt32 temperature;
-    } 
+    }
 
     public class BMP280Sensor
     {
@@ -35,7 +35,7 @@ namespace Datalogger
         private const int OPEN_READ_WRITE = 2;
         private const int I2C_SLAVE = 0x0703;
 
-        [DllImport("libc.so.6", EntryPoint = "open", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport("libc.so.6", EntryPoint = "open", SetLastError = true)]
         internal static extern int Open(string fileName, int mode);
 
         [DllImport("libc.so.6", EntryPoint = "ioctl", SetLastError = true)]
@@ -68,14 +68,13 @@ namespace Datalogger
             presFile.Close();
         }
 
-        const byte BME280_REGISTER_DIG_T1 = 0x88; //temperature 1 address
-        const byte BME280_REGISTER_DIG_T2 = 0x8A; //temperature 2 address
-        const byte BME280_REGISTER_DIG_T3 = 0x8C; //temperature 3 address
-        const byte BMP280_TEMP_MSB_ADDR = (0xFA);
-        const byte BMP280_TEMP_LSB_ADDR = (0xFB);
-        const byte BMP280_TEMP_XLSB_ADDR = (0xFC);
-        const byte BMP280_CTRL_MEAS_ADDR = (0xF4);
-
+        private const byte BME280_REGISTER_DIG_T1 = 0x88; //temperature 1 address
+        private const byte BME280_REGISTER_DIG_T2 = 0x8A; //temperature 2 address
+        private const byte BME280_REGISTER_DIG_T3 = 0x8C; //temperature 3 address
+        private const byte BMP280_TEMP_MSB_ADDR = (0xFA);
+        private const byte BMP280_TEMP_LSB_ADDR = (0xFB);
+        private const byte BMP280_TEMP_XLSB_ADDR = (0xFC);
+        private const byte BMP280_CTRL_MEAS_ADDR = (0xF4);
 
         private void sensor_init()
         {
@@ -185,9 +184,8 @@ namespace Datalogger
             return 0;
         }
 
-        byte[] i2c_reg_read(byte reg_addr, UInt16 length)
+        private byte[] i2c_reg_read(byte reg_addr, UInt16 length)
         {
-
             /* Implement the I2C read routine according to the target machine. */
             int fd;
             if ((fd = Open("/dev/i2c-1", OPEN_READ_WRITE)) < 0)
