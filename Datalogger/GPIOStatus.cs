@@ -4,6 +4,5 @@
     {
         Temperature = 0,
         Pressure = 1,
-        Invalid
     }
 }

@@ -11,7 +11,7 @@ namespace Datalogger
             BMP280Sensor sens = new BMP280Sensor();
             while (true)
             {
-                Console.WriteLine(sens.bmp280_get_temp());
+                Console.WriteLine(sens.getData(GPIOStatus.Temperature));
                 Thread.Sleep(1000);
             }
             GPIOModule mod = new GPIOModule(); // static instead of object?
