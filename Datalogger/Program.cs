@@ -9,19 +9,21 @@ namespace Datalogger
         {
             I2CDisplay disp = new I2CDisplay(0x49);
             BMP280Sensor sens = new BMP280Sensor();
-            while (true)
-            {
-                Console.WriteLine(sens.getData(GPIOStatus.Temperature));
-                Thread.Sleep(1000);
-            }
             GPIOModule mod = new GPIOModule(); // static instead of object?
+            /*while (true)
+            {
+                Console.WriteLine(sens.getData(mod.getStatus()));
+                Thread.Sleep(1000);
+            }*/
             //disp.write("-1.1");
             //disp.writeLow("<C");
             //disp.flush();
+            Thread.Sleep(1000);
             while (true)
             {
-                GPIOStatus status = GPIOStatus.Temperature;//mod.getStatus();
+                GPIOStatus status = mod.getStatus();
                 double data = sens.getData(status);
+                Console.WriteLine(data);
                 switch (status)
                 {
                     case GPIOStatus.Temperature:
@@ -30,8 +32,8 @@ namespace Datalogger
                         break;
 
                     case GPIOStatus.Pressure:
-                        disp.write(data.ToString());
-                        disp.writeLow("pa");//TODO: display string
+                        disp.write((data / 100).ToString());
+                        //disp.writeLow("pa");//TODO: display string
                         break;
                 }
                 disp.flush();

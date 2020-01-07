@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 
 namespace Datalogger
 {
@@ -7,11 +7,12 @@ namespace Datalogger
     {
         public GPIOStatus getStatus()
         {
-            var dev = File.OpenRead("/dev/boi");
-            byte[] data = new byte[1];
-            dev.Read(data, 0, 1);
+            var dev = File.OpenRead("/dev/myboi");
+            byte[] data = new byte[2];
+            dev.Read(data, 0, 2);
             dev.Close();
-            switch (data[0])
+            string s = Encoding.ASCII.GetString(data);
+            switch (int.Parse(s))
             {
                 case 0:
                     return GPIOStatus.Temperature;

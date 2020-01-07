@@ -23,7 +23,7 @@ namespace Datalogger
         private int offset = 11;
         private int offsetLow = 11;
 
-        public I2CDisplay(int address)
+        public I2CDisplay(byte address)
         {
             dev = new I2CDevice(address);
             // 0
@@ -201,6 +201,7 @@ namespace Datalogger
             return -1;
         }
 
+        // TODO: prevent the last symbol from being a dot
         public void write(string text)
         {
             for (int i = 0; i < text.Length; i++)
@@ -255,11 +256,16 @@ namespace Datalogger
                     dataBytes <<= 1;
                     if (pixels[i, j]) dataBytes++;
                 }
-                byte[] data = new byte[3];
+                /*byte[] data = new byte[3];
                 data[0] = addr;
                 data[1] = (byte)(dataBytes & 0b1111_1111);
                 data[2] = (byte)((dataBytes >> 8) & 0b1111_1111);
-                int ret = dev.writeData(3, data);
+                //int ret = dev.writeData(3, data);*/
+                byte[] data = new byte[2];
+                data[0] = (byte)(dataBytes & 0b1111_1111);
+                data[1] = (byte)((dataBytes >> 8) & 0b1111_1111);
+                //int ret = dev.writeData(3, data);*/
+                int ret = dev.i2c_reg_write(addr, data, 2);
                 addr += 2;
             }
 

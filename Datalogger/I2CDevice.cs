@@ -23,51 +23,81 @@ namespace Datalogger
         [DllImport("libc.so.6", EntryPoint = "close", SetLastError = true)]
         internal static extern int Close(int busHandle);
 
-        private readonly int address;
+        private readonly byte address;
 
-        public I2CDevice(int address)
+        public I2CDevice(byte address)
         {
             this.address = address;
         }
 
-        public byte[] readData(int length)
+        public int i2c_reg_write(byte reg_addr, byte[] reg_data, UInt16 length)
         {
-            int fd = Open("/dev/i2c-1", OPEN_READ_WRITE);
-            if (fd < 0) return null;
-            var deviceReturncode = Ioctl(fd, I2C_SLAVE, address);
-            if (deviceReturncode < 0) return null;
-            byte[] data = new byte[length];
-            var returnCode = Read(fd, data, length);
-            if (returnCode < 0) return null;
-            Close(fd);
-            return data;
+            /* init i2c */
+            int fd;
+            if ((fd = Open("/dev/i2c-1", OPEN_READ_WRITE)) < 0)
+            {
+                Console.WriteLine("Open failed errno: {0}\n", Marshal.GetLastWin32Error());
+                return -1;
+            }
+
+            if (Ioctl(fd, I2C_SLAVE, address) < 0)
+            {
+                Console.WriteLine("ioctl failed errno: {0}\n", Marshal.GetLastWin32Error());
+                return -1;
+            }
+            // Write reg address
+            byte[] newData = new byte[length + 1];
+            newData[0] = reg_addr;
+            Array.Copy(reg_data, 0, newData, 1, length);
+            if (Write(fd, newData, 1 + length) < 0)
+            {
+                Console.WriteLine("i2c_write: could not write reg addr errno {0}, a\n", Marshal.GetLastWin32Error());
+                return -1;
+            }
+            if (Close(fd) < 0)
+            {
+                Console.WriteLine("close failed errno {0}\n", Marshal.GetLastWin32Error());
+                return -1;
+            }
+            return 0;
         }
 
-        public int writeData(int length, byte[] data)
+        public byte[] i2c_reg_read(byte reg_addr, UInt16 length)
         {
-            int fd = Open("/dev/i2c-1", OPEN_READ_WRITE);
-            if (fd < 0)
+            /* Implement the I2C read routine according to the target machine. */
+            int fd;
+            if ((fd = Open("/dev/i2c-1", OPEN_READ_WRITE)) < 0)
             {
-                int errno = Marshal.GetLastWin32Error();
-                Console.WriteLine("Open errno: {0}", errno);
-                return errno;
+                Console.WriteLine("Open failed errno: {0}\n", Marshal.GetLastWin32Error());
+                return null;
             }
-            var deviceReturncode = Ioctl(fd, I2C_SLAVE, address);
-            if (deviceReturncode < 0)
+
+            if (Ioctl(fd, I2C_SLAVE, address) < 0)
             {
-                int errno = Marshal.GetLastWin32Error();
-                Console.WriteLine("Icctl errno: {0}", errno);
-                return errno;
+                Console.WriteLine("ioctl failed errno: {0}\n", Marshal.GetLastWin32Error());
+                return null;
             }
-            var err = Write(fd, data, length);
-            if (err < 0)
+            // Write reg address
+            if (reg_addr != -1)
             {
-                int errno = Marshal.GetLastWin32Error();
-                Console.WriteLine("Write errno: {0}", errno);
-                return errno;
+                if (Write(fd, new byte[] { reg_addr }, 1) != 1)
+                {
+                    Console.WriteLine("could not write reg addr errno {0}\n", Marshal.GetLastWin32Error());
+                    return null;
+                }
             }
-            Close(fd);
-            return 0;
+            byte[] data = new byte[length];
+            if (Read(fd, data, length) < 0)
+            {
+                Console.WriteLine("read failed. errno {0}\n", Marshal.GetLastWin32Error());
+                return null;
+            }
+            if (Close(fd) < 0)
+            {
+                Console.WriteLine("close failed errno {0}\n", Marshal.GetLastWin32Error());
+                return null;
+            }
+            return data;
         }
     }
 }
