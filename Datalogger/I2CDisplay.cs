@@ -179,6 +179,11 @@ namespace Datalogger
             symbols[13][2, 3] = true;
         }
 
+        ~I2CDisplay()
+        {
+            clear();
+        }
+
         private int getIndex(char input)
         {
             switch (input)
@@ -199,6 +204,19 @@ namespace Datalogger
                 case 'C': return 13; // circ
             }
             return -1;
+        }
+
+        public void clear()
+        {
+            Console.WriteLine("clear");
+            for (int x = 0; x < pixels.GetLength(0); x++)
+            {
+                for (int y = 0; y < pixels.GetLength(1); y++)
+                {
+                    pixels[x, y] = false;
+                }
+            }
+            flush();
         }
 
         // TODO: prevent the last symbol from being a dot

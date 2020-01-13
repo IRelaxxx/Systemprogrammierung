@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Datalogger
@@ -35,11 +34,13 @@ namespace Datalogger
         private FileStream presFile;
         private bmp280_calib_data calib;
         private I2CDevice i2c_sensor;
+        private DateTime lastDay; // If today way your last Day ...
 
         public BMP280Sensor()
         {
-            tempFile = File.OpenWrite("temperature.csv");
-            presFile = File.OpenWrite("pressure.csv");
+            lastDay = DateTime.Today;
+            openfiles();
+
             i2c_sensor = new I2CDevice(0x77);
             sensor_init();
         }
@@ -48,6 +49,14 @@ namespace Datalogger
         {
             tempFile.Close();
             presFile.Close();
+        }
+
+        private void openfiles()
+        {
+            if (tempFile != null) tempFile.Close();
+            if (presFile != null) presFile.Close();
+            tempFile = File.OpenWrite("temperature" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
+            presFile = File.OpenWrite("pressure" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
         }
 
         private const byte BME280_REGISTER_DIG_T1 = 0x88; //temperature 1 address
@@ -77,7 +86,7 @@ namespace Datalogger
             calib.dig_P8 = BitConverter.ToInt16(data.Slice(20, 2));
             calib.dig_P9 = BitConverter.ToInt16(data.Slice(22, 2));
             i2c_sensor.i2c_reg_write(BMP280_CTRL_MEAS_ADDR, new byte[] { 0b01010111 }, 1); // Temp OS x2(010) Pres OS x 16(101) Normal mode(11)
-            i2c_sensor.i2c_reg_write(0xF5/*config register*/, new byte[] { 0b10000100 }, 1); // 500 ms standby(100) Filter x2 (001)(best guess) padding(0) Spi off(0)
+            i2c_sensor.i2c_reg_write(0xF5/*config register*/, new byte[] { 0b10001000 }, 1); // 500 ms standby(100) Filter x4 (010)(best guess) padding(0) Spi off(0)
         }
 
         private bmp280_uncomp_data bmp280_get_uncomp_data()
@@ -142,8 +151,14 @@ namespace Datalogger
             return bmp280_calc_pres_double((UInt32)data.pressure);
         }
 
-        public double getData(GPIOStatus status)
+        public (double, double) getData()
         {
+            // New day -> save to new files
+            if (DateTime.Today > lastDay)
+            {
+                lastDay = DateTime.Today;
+                openfiles();
+            }
             bmp280_uncomp_data data = bmp280_get_uncomp_data();
             double temp = bmp280_calc_temp_double((Int32)data.temperature);
             double press = bmp280_calc_pres_double((UInt32)data.pressure);
@@ -159,7 +174,7 @@ namespace Datalogger
             presFile.Write(Encoding.ASCII.GetBytes("\n"));
             tempFile.Flush();
             presFile.Flush();
-            return status == GPIOStatus.Temperature ? temp : press;
+            return (temp, press);
         }
     }
 }
