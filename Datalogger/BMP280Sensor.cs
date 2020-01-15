@@ -30,33 +30,14 @@ namespace Datalogger
             public UInt32 pressure;
         }
 
-        private FileStream tempFile;
-        private FileStream presFile;
         private bmp280_calib_data calib;
         private I2CDevice i2c_sensor;
         private DateTime lastDay; // If today way your last Day ...
 
         public BMP280Sensor()
         {
-            lastDay = DateTime.Today;
-            openfiles();
-
             i2c_sensor = new I2CDevice(0x77);
             sensor_init();
-        }
-
-        ~BMP280Sensor()
-        {
-            tempFile.Close();
-            presFile.Close();
-        }
-
-        private void openfiles()
-        {
-            if (tempFile != null) tempFile.Close();
-            if (presFile != null) presFile.Close();
-            tempFile = File.OpenWrite("temperature" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
-            presFile = File.OpenWrite("pressure" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
         }
 
         private const byte BME280_REGISTER_DIG_T1 = 0x88; //temperature 1 address
@@ -153,12 +134,9 @@ namespace Datalogger
 
         public (double, double) getData()
         {
-            // New day -> save to new files
-            if (DateTime.Today > lastDay)
-            {
-                lastDay = DateTime.Today;
-                openfiles();
-            }
+            using FileStream tempFile = File.OpenWrite("temperature" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
+            using FileStream presFile = File.OpenWrite("pressure" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
+
             bmp280_uncomp_data data = bmp280_get_uncomp_data();
             double temp = bmp280_calc_temp_double((Int32)data.temperature);
             double press = bmp280_calc_pres_double((UInt32)data.pressure);
