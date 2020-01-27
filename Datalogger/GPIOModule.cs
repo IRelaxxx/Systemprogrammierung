@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 namespace Datalogger
@@ -26,10 +27,16 @@ namespace Datalogger
 
         public void setPWMValue(byte val)
         {
-            using (var dev = File.OpenWrite(drvPath))
+            try
             {
-                dev.WriteByte(val);
-            }
+                using (var dev = File.OpenWrite(drvPath))
+                {
+                    dev.WriteByte(val);
+                }
+            } catch(IOException ex)
+            {
+                Console.WriteLine("Could not open(write) device driver");
+            } 
         }
     }
 }
