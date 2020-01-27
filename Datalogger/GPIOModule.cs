@@ -5,7 +5,7 @@ namespace Datalogger
 {
     public class GPIOModule
     {
-        private const string drvPath = "/dev/myboi";
+        private const string drvPath = "/dev/sysprog";
 
         public GPIOStatus getStatus()
         {
