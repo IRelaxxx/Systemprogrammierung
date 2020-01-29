@@ -46,7 +46,7 @@ namespace Datalogger
 
                     case GPIOStatus.Pressure:
                         disp.write((press / 100).ToString());
-                        //disp.writeLow("hpa");//TODO: display string
+                        disp.writeLow("hPa");
                         break;
                 }
                 disp.flush();

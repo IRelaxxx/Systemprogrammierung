@@ -19,7 +19,7 @@ namespace Datalogger
         //                    \/ 10
         private bool[,] pixels = new bool[12, 10];
 
-        private readonly bool[][,] symbols = new bool[14][,];
+        private readonly bool[][,] symbols = new bool[17][,];
         private int offset = 11;
         private int offsetLow = 11;
 
@@ -135,14 +135,14 @@ namespace Datalogger
             symbols[11][1, 4] = true;
 
             // circ
-            symbols[12] = new bool[3, 5];
+            symbols[12] = new bool[4, 5];
             symbols[12][0, 1] = true;
             symbols[12][1, 0] = true;
             symbols[12][1, 2] = true;
             symbols[12][2, 1] = true;
 
             // C
-            symbols[13] = new bool[3, 5];
+            symbols[13] = new bool[4, 5];
             symbols[13][0, 1] = true;
             symbols[13][0, 2] = true;
             symbols[13][0, 3] = true;
@@ -150,6 +150,39 @@ namespace Datalogger
             symbols[13][1, 4] = true;
             symbols[13][2, 0] = true;
             symbols[13][2, 4] = true;
+
+            // h
+            symbols[14] = new bool[4, 5];
+            symbols[14][0, 0] = true;
+            symbols[14][0, 1] = true;
+            symbols[14][0, 2] = true;
+            symbols[14][0, 3] = true;
+            symbols[14][0, 4] = true;
+            symbols[14][1, 2] = true;
+            symbols[14][2, 2] = true;
+            symbols[14][2, 3] = true;
+            symbols[14][2, 4] = true;
+
+            // P
+            symbols[15] = new bool[4, 5];
+            symbols[15][0, 0] = true;
+            symbols[15][0, 1] = true;
+            symbols[15][0, 2] = true;
+            symbols[15][0, 3] = true;
+            symbols[15][0, 4] = true;
+            symbols[15][1, 0] = true;
+            symbols[15][1, 2] = true;
+            symbols[15][2, 1] = true;
+
+            // a
+            symbols[16] = new bool[4, 5];
+            symbols[16][0, 3] = true;
+            symbols[16][0, 4] = true;
+            symbols[16][1, 2] = true;
+            symbols[16][1, 4] = true;
+            symbols[16][2, 2] = true;
+            symbols[16][2, 3] = true;
+            symbols[16][2, 4] = true;
         }
 
         ~I2CDisplay()
@@ -174,7 +207,10 @@ namespace Datalogger
                 case '-': return 10;
                 case '.': return 11;
                 case '<': return 12; // circ
-                case 'C': return 13; // circ
+                case 'C': return 13;
+                case 'h': return 14;
+                case 'P': return 15;
+                case 'a': return 16;
             }
             return -1;
         }
