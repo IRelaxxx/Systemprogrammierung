@@ -29,7 +29,7 @@
         data.addColumn('datetime', 'Time');
         data.addColumn('number', dataIn.vals[0]);
         for(i = 1; i < dataIn.dates.length; i++) {
-            data.addRow([new Date(Date.parse(dataIn.dates[i])), parseInt(dataIn.vals[i])]);
+            data.addRow([new Date(Date.parse(dataIn.dates[i])), parseFloat(dataIn.vals[i])]);
         }
         console.log(data);
         var options = {
