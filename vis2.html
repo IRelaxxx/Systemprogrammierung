@@ -1,0 +1,170 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.4"></script>
+	<style>
+		canvas {
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
+	<style type="text/css">/* Chart.js */
+@keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}.chartjs-size-monitor,.chartjs-size-monitor-expand,.chartjs-size-monitor-shrink{position:absolute;direction:ltr;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1}.chartjs-size-monitor-expand>div{position:absolute;width:1000000px;height:1000000px;left:0;top:0}.chartjs-size-monitor-shrink>div{position:absolute;width:200%;height:200%;left:0;top:0}
+	</style>
+  </head>
+  <body>
+	<input type="file" id="file-input" />
+    <div style="width:75%;"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+		<canvas id="canvas" style="display: block; width: 193px; height: 96px;" width="193" height="96" class="chartjs-render-monitor"></canvas>
+	</div>
+    <script type="text/javascript">
+		window.chartColors = {
+			red: 'rgb(255, 99, 132)',
+			orange: 'rgb(255, 159, 64)',
+			yellow: 'rgb(255, 205, 86)',
+			green: 'rgb(75, 192, 192)',
+			blue: 'rgb(54, 162, 235)',
+			purple: 'rgb(153, 102, 255)',
+			grey: 'rgb(201, 203, 207)'
+		};
+
+		var color = Chart.helpers.color;
+		var config = {
+			type: 'line',
+			data: {
+				datasets: [{
+					label: 'Dataset',
+					backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+					borderColor: window.chartColors.red,
+					fill: false,
+					data: [],
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: false,
+					text: 'Data Viewer'
+				},
+				scales: {
+					xAxes: [{
+						type: 'time',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Time'
+						},
+						ticks: {
+							major: {
+								fontStyle: 'bold',
+								fontColor: '#FF0000'
+							}
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'value'
+						}
+					}]
+				}
+			},
+			plugins: {
+				zoom: {
+					// Container for pan options
+					pan: {
+						// Boolean to enable panning
+						enabled: true,
+			
+						// Panning directions. Remove the appropriate direction to disable
+						// Eg. 'y' would only allow panning in the y direction
+						// A function that is called as the user is panning and returns the
+						// available directions can also be used:
+						//   mode: function({ chart }) {
+						//     return 'xy';
+						//   },
+						mode: 'y',
+			
+						// Function called while the user is panning
+						onPan: function({chart}) { console.log(`I'm panning!!!`); },
+						// Function called once panning is completed
+						onPanComplete: function({chart}) { console.log(`I was panned!!!`); }
+					},
+			
+					// Container for zoom options
+					zoom: {
+						// Boolean to enable zooming
+						enabled: true,
+			
+						// Enable drag-to-zoom behavior
+						drag: true,
+			
+						// Drag-to-zoom effect can be customized
+						// drag: {
+						// 	 borderColor: 'rgba(225,225,225,0.3)'
+						// 	 borderWidth: 5,
+						// 	 backgroundColor: 'rgb(225,225,225)',
+						// 	 animationDuration: 0
+						// },
+			
+						// Zooming directions. Remove the appropriate direction to disable
+						// Eg. 'y' would only allow zooming in the y direction
+						// A function that is called as the user is zooming and returns the
+						// available directions can also be used:
+						//   mode: function({ chart }) {
+						//     return 'xy';
+						//   },
+						mode: 'x',
+			
+						// Speed of zoom via mouse wheel
+						// (percentage of zoom on a wheel event)
+						speed: 0.1,
+			
+						// Function called while the user is zooming
+						onZoom: function({chart}) { console.log(`I'm zooming!!!`); },
+						// Function called once zooming is completed
+						onZoomComplete: function({chart}) { console.log(`I was zoomed!!!`); }
+					}
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+			document.getElementById('file-input').addEventListener('change', readFile, false);
+		};
+
+      var file2;
+      function readFile(e) {
+        var file = e.target.files[0];
+        console.log(file);
+        file2 = file;
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            drawChart(JSON.parse(contents));
+        };
+        reader.readAsText(file);
+      }
+
+      function drawChart(dataIn) {
+        var data = [];
+        for(i = 1; i < dataIn.dates.length; i++) {
+            data.push({x: moment(dataIn.dates[i]/*, 'MM-dd-yyyy HH:mm:ss'*/), y: parseFloat(dataIn.vals[i])});
+        }
+        console.log(data);
+        config.data.datasets[0].data = data;
+		window.myLine.update();
+      }
+    </script>
+  </body>
+</html>
