@@ -134,8 +134,8 @@ namespace Datalogger
 
         public (double, double) getData()
         {
-            using FileStream tempFile = File.OpenWrite("temperature" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
-            using FileStream presFile = File.OpenWrite("pressure" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv");
+            using FileStream tempFile = File.Open("temperature" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv", FileMode.Append);
+            using FileStream presFile = File.Open("pressure" + DateTime.Today.ToShortDateString().Replace('/', '-') + ".csv", FileMode.Append);
 
             bmp280_uncomp_data data = bmp280_get_uncomp_data();
             double temp = bmp280_calc_temp_double((Int32)data.temperature);

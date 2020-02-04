@@ -8,10 +8,12 @@ namespace FileConverter
     {
         private static void Main(string[] args)
         {
-            string file = args.Length > 2 ? args[1] : string.Empty;
+            string file = args.Length >= 1 ? args[0] : string.Empty;
+            Console.WriteLine(file);
             if (string.IsNullOrEmpty(file))
             {
                 Console.WriteLine("Usage: fileconverter FILEPATH");
+                return;
             }
 
             string[] text = File.ReadAllLines(file);
